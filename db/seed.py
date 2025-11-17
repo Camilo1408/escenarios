@@ -2,7 +2,7 @@ import pandas as pd
 from app import create_app
 from db.models import db, Escenario
 
-CSV_PATH = 'ESCENARIO_DE_RECREACION_DEPORTIVA_NEIVA_2022_20251110.csv'
+CSV_PATH = '/ESCENARIO_DE_RECREACION_DEPORTIVA_NEIVA_2022_20251110.csv'
 
 app = create_app()
 with app.app_context():

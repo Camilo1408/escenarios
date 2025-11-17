@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Informe de escenarios</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        font-size: 11pt;
+        margin: 20px;
+      }
+      h1,
+      h2,
+      h3 {
+        margin: 0 0 5px;
+      }
+      h1 {
+        font-size: 18pt;
+        text-align: center;
+        margin-bottom: 10px;
+      }
+      h2 {
+        font-size: 14pt;
+        margin-top: 15px;
+      }
+      p {
+        margin: 3px 0;
+      }
+      .resumen {
+        margin-bottom: 15px;
+        border: 1px solid #555;
+        padding: 10px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      th,
+      td {
+        border: 1px solid #555;
+        padding: 4px 6px;
+      }
+      th {
+        background-color: #eee;
+      }
+      .small {
+        font-size: 9pt;
+        color: #555;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Informe de escenarios de recreación y deporte</h1>
+
+    <div class="resumen">
+      <p><strong>Ciudad:</strong> Neiva</p>
+      <p><strong>Total de escenarios:</strong> {{ total }}</p>
+      <p><strong>Fecha de generación:</strong> {{ fecha }}</p>
+    </div>
+
+    <h2>Listado de escenarios</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Comuna</th>
+          <th>Barrio</th>
+          <th>Escenario</th>
+          <th>Dirección</th>
+          <th>Mapa</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in data %}
+        <tr>
+          <td>{{ item.id }}</td>
+          <td>{{ item.comuna }}</td>
+          <td>{{ item.barrio }}</td>
+          <td>{{ item.escenario }}</td>
+          <td>{{ item.direccion }}</td>
+          <td>
+            {% if item.url_maps %} {{ item.url_maps }} {% else %} N/D {% endif
+            %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6">No hay escenarios registrados.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <p class="small">
+      Fuente: Datos abiertos de escenarios de recreación y deporte – Neiva 2022.
+    </p>
+  </body>
+</html>

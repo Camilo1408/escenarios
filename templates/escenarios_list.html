@@ -1,0 +1,123 @@
+{% extends "base.html" %} {% block title %}Escenarios – Listado{% endblock %} {%
+block content %}
+<div class="row mb-4">
+  <div class="col-md-12">
+    <h1 class="mb-1">Escenarios</h1>
+    <p class="text-muted">Listado de escenarios de recreación y deporte.</p>
+  </div>
+</div>
+
+<div class="row mb-3">
+  <div class="col-md-12 d-flex justify-content-between align-items-center">
+    <form class="d-flex align-items-center" method="get">
+      <label for="comuna" class="me-2 mb-0">Filtrar por comuna:</label>
+      <input
+        type="number"
+        class="form-control form-control-sm me-2"
+        style="max-width: 120px"
+        id="comuna"
+        name="comuna"
+        value="{{ request.args.get('comuna','') }}"
+      />
+      <button class="btn btn-sm btn-primary me-2" type="submit">Filtrar</button>
+      <a
+        href="{{ url_for('escenarios.list_esc') }}"
+        class="btn btn-sm btn-outline-secondary"
+      >
+        Limpiar
+      </a>
+    </form>
+    <div>
+      <a
+        href="{{ url_for('escenarios.new_form') }}"
+        class="btn btn-sm btn-success"
+      >
+        Nuevo escenario
+      </a>
+      <a
+        href="{{ url_for('escenarios.export_excel') }}"
+        class="btn btn-sm btn-outline-primary"
+      >
+        Excel
+      </a>
+      <a
+        href="{{ url_for('escenarios.export_pdf') }}"
+        class="btn btn-sm btn-outline-secondary"
+      >
+        PDF
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-hover table-sm align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>ID</th>
+                <th>Comuna</th>
+                <th>Barrio</th>
+                <th>Escenario</th>
+                <th>Dirección</th>
+                <th>Mapa</th>
+                <th style="width: 110px">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in data %}
+              <tr>
+                <td>{{ item.id }}</td>
+                <td>{{ item.comuna }}</td>
+                <td>{{ item.barrio }}</td>
+                <td>{{ item.escenario }}</td>
+                <td>{{ item.direccion }}</td>
+                <td>
+                  {% if item.url_maps %}
+                  <a
+                    href="{{ item.url_maps }}"
+                    target="_blank"
+                    class="btn btn-sm btn-outline-info"
+                  >
+                    Ver mapa
+                  </a>
+                  {% else %}
+                  <span class="text-muted">N/D</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <a
+                    href="{{ url_for('escenarios.edit_form', id=item.id) }}"
+                    class="btn btn-sm btn-primary mb-1"
+                    >Editar</a
+                  >
+                  <form
+                    action="{{ url_for('escenarios.delete', id=item.id) }}"
+                    method="post"
+                    style="display: inline"
+                    onsubmit="return confirm('¿Eliminar este escenario?');"
+                  >
+                    <button type="submit" class="btn btn-sm btn-danger">
+                      Eliminar
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="7" class="text-center text-muted">
+                  No hay escenarios registrados.
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

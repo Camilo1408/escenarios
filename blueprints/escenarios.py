@@ -1,7 +1,9 @@
-from flask import Blueprint, render_template, request, redirect, url_for, send_file
+from flask import Blueprint, render_template, request, redirect, url_for, send_file, current_app
 from db.models import Escenario, db
 import pandas as pd
 import io
+from datetime import datetime
+from weasyprint import HTML
 
 bp = Blueprint('escenarios', __name__)
 
@@ -61,3 +63,32 @@ def export_excel():
         df.to_excel(writer, index=False, sheet_name='Escenarios')
     buf.seek(0)
     return send_file(buf, as_attachment=True, download_name='escenarios.xlsx')
+
+@bp.get('export/pdf')
+def export_pdf():
+    q = Escenario.query
+    comuna = request.args.get('comuna')
+    if comuna:
+        q = q.filter_by(comuna=int(comuna))
+    
+    data = q.order_by(Escenario.comuna, Escenario.barrio).all()
+    total = len(data)
+    fecha = datetime.now().strftime("%Y-%m-%d %H:%M")
+
+    html = render_template(
+        'reporte.html',
+        data=data,
+        total=total,
+        fecha=fecha
+    )
+
+    pdf = HTML(string=html, base_url=current_app.root_path).write_pdf()
+
+    buffer = io.BytesIO(pdf)
+    buffer.seek(0)
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name="Informe_escenarios.pdf",
+        mimetype="application/pdf"
+    )

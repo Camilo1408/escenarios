@@ -1,0 +1,117 @@
+{% extends "base.html" %} {% block title %}Dashboard – Escenarios{% endblock %}
+{% block head_extra %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %} {% block content %}
+<div class="row mb-4">
+  <div class="col-md-12">
+    <h1 class="mb-1">Dashboard de Escenarios</h1>
+    <p class="text-muted">
+      Resumen general de los escenarios de recreación y deporte de Neiva.
+    </p>
+  </div>
+</div>
+
+<div class="row mb-4">
+  <div class="col-md-4">
+    <div class="card card-kpi shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Total de escenarios</h5>
+        <p class="display-5 mb-0">{{ total }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-8">
+    <div class="card card-kpi shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Escenarios por comuna</h5>
+        <canvas id="chartComunas" height="120"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mb-3">
+  <div class="col-md-12">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="card-title mb-0">Detalle por comuna</h5>
+          <a
+            href="{{ url_for('escenarios.export_excel') }}"
+            class="btn btn-sm btn-outline-primary"
+          >
+            Exportar a Excel
+          </a>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-sm table-striped mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Comuna</th>
+                <th>Cantidad de escenarios</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in by_comuna %}
+              <tr>
+                <td>{{ row.comuna }}</td>
+                <td>{{ row.c }}</td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="2" class="text-center text-muted">Sin datos</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="mt-3 text-end">
+          <a
+            href="{{ url_for('escenarios.export_pdf') }}"
+            class="btn btn-sm btn-outline-secondary"
+          >
+            Exportar informe PDF
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %} {{ super() }}
+<script>
+  const comunas = [
+    {% for row in by_comuna %}
+      "{{ row.comuna }}"{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ];
+  const cantidades = [
+    {% for row in by_comuna %}
+      {{ row.c }}{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  const ctx = document.getElementById('chartComunas').getContext('2d');
+  const chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: comunas,
+      datasets: [{
+        label: 'Escenarios por comuna',
+        data: cantidades
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            precision: 0
+          }
+        }
+      }
+    }
+  });
+</script>
+{% endblock %}
