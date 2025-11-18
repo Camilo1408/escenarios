@@ -4,7 +4,7 @@ db = SQLAlchemy()
 class Escenario(db.Model):
     __tablename__ = 'escenarios'
     id = db.Column(db.Integer, primary_key=True)
-    comuna = db.Column(db.Integer, nullable=False)
+    comuna = db.Column(db.String(50), nullable=False)
     barrio = db.Column(db.String(120), nullable=False)
     escenario = db.Column(db.String(160), nullable=False)
     direccion = db.Column(db.String(200), nullable=False)

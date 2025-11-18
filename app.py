@@ -4,6 +4,7 @@ import os
 
 def create_app():
     load_dotenv()
+    print("DEBUG DB_URL:", repr(os.getenv("DATABASE_URL")))
     app = Flask(__name__)
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'devkey')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL','sqlite:///local.db')
@@ -23,3 +24,7 @@ def create_app():
     return app
 
 app = create_app()
+
+
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5000)

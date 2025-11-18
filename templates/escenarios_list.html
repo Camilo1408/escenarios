@@ -1,5 +1,7 @@
-{% extends "base.html" %} {% block title %}Escenarios – Listado{% endblock %} {%
-block content %}
+{% extends "base.html" %}
+{% block title %}Escenarios – Listado{% endblock %}
+{% block content %}
+
 <div class="row mb-4">
   <div class="col-md-12">
     <h1 class="mb-1">Escenarios</h1>
@@ -9,41 +11,56 @@ block content %}
 
 <div class="row mb-3">
   <div class="col-md-12 d-flex justify-content-between align-items-center">
-    <form class="d-flex align-items-center" method="get">
-      <label for="comuna" class="me-2 mb-0">Filtrar por comuna:</label>
-      <input
-        type="number"
-        class="form-control form-control-sm me-2"
-        style="max-width: 120px"
-        id="comuna"
-        name="comuna"
-        value="{{ request.args.get('comuna','') }}"
-      />
-      <button class="btn btn-sm btn-primary me-2" type="submit">Filtrar</button>
-      <a
-        href="{{ url_for('escenarios.list_esc') }}"
-        class="btn btn-sm btn-outline-secondary"
-      >
-        Limpiar
-      </a>
+    <form class="row g-2 align-items-end" method="get">
+      <div class="col-auto">
+        <label for="comuna" class="form-label mb-0">Filtrar por comuna:</label>
+        <select
+          id="comuna"
+          name="comuna"
+          class="form-select form-select-sm"
+          style="min-width: 140px"
+          onchange="this.form.submit()"
+        >
+          <option value="">Todas</option>
+          {% for c in comunas %}
+            <option value="{{ c }}" {% if c == comuna_seleccionada %}selected{% endif %}>
+              {{ c }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-auto">
+        <label for="per_page" class="form-label mb-0">Resultados por página:</label>
+        <select
+          id="per_page"
+          name="per_page"
+          class="form-select form-select-sm"
+          onchange="this.form.submit()"
+        >
+          {% for n in [10, 25, 50] %}
+            <option value="{{ n }}" {% if per_page == n %}selected{% endif %}>
+              {{ n }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-auto">
+        <a href="{{ url_for('escenarios.list_esc') }}" class="btn btn-sm btn-outline-secondary mt-3">
+          Limpiar
+        </a>
+      </div>
     </form>
-    <div>
-      <a
-        href="{{ url_for('escenarios.new_form') }}"
-        class="btn btn-sm btn-success"
-      >
+
+    <div class="text-end">
+      <a href="{{ url_for('escenarios.new_form') }}" class="btn btn-sm btn-success">
         Nuevo escenario
       </a>
-      <a
-        href="{{ url_for('escenarios.export_excel') }}"
-        class="btn btn-sm btn-outline-primary"
-      >
+      <a href="{{ url_for('escenarios.export_excel') }}" class="btn btn-sm btn-outline-primary">
         Excel
       </a>
-      <a
-        href="{{ url_for('escenarios.export_pdf') }}"
-        class="btn btn-sm btn-outline-secondary"
-      >
+      <a href="{{ url_for('escenarios.export_pdf') }}" class="btn btn-sm btn-outline-secondary">
         PDF
       </a>
     </div>
@@ -63,7 +80,7 @@ block content %}
                 <th>Barrio</th>
                 <th>Escenario</th>
                 <th>Dirección</th>
-                <th>Mapa</th>
+                <th class="text-center">Mapa</th>
                 <th style="width: 110px">Acciones</th>
               </tr>
             </thead>
@@ -75,25 +92,30 @@ block content %}
                 <td>{{ item.barrio }}</td>
                 <td>{{ item.escenario }}</td>
                 <td>{{ item.direccion }}</td>
-                <td>
-                  {% if item.url_maps %}
-                  <a
-                    href="{{ item.url_maps }}"
-                    target="_blank"
-                    class="btn btn-sm btn-outline-info"
-                  >
-                    Ver mapa
-                  </a>
+                <td class="text-center">
+                  {% set url = (item.url_maps or '').strip() %}
+                  {% if url and url.startswith('http') %}
+                    <a
+                      href="{{ url }}"
+                      target="_blank"
+                      class="btn btn-outline-info btn-sm"
+                    >
+                      Ver mapa
+                    </a>
                   {% else %}
-                  <span class="text-muted">N/D</span>
+                    <button class="btn btn-outline-secondary btn-sm" disabled>
+                      Sin mapa
+                    </button>
                   {% endif %}
                 </td>
+
                 <td>
                   <a
                     href="{{ url_for('escenarios.edit_form', id=item.id) }}"
                     class="btn btn-sm btn-primary mb-1"
-                    >Editar</a
                   >
+                    Editar
+                  </a>
                   <form
                     action="{{ url_for('escenarios.delete', id=item.id) }}"
                     method="post"
@@ -116,8 +138,53 @@ block content %}
             </tbody>
           </table>
         </div>
+
+        <!-- Paginación -->
+        <nav aria-label="Paginación de escenarios">
+          <ul class="pagination justify-content-center mt-3">
+            <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+              <a
+                class="page-link"
+                href="{{ url_for('escenarios.list_esc',
+                                 page=page-1,
+                                 per_page=per_page,
+                                 comuna=comuna_seleccionada) }}"
+              >
+                Anterior
+              </a>
+            </li>
+
+            {% for p in range(1, pages + 1) %}
+              <li class="page-item {% if p == page %}active{% endif %}">
+                <a
+                  class="page-link"
+                  href="{{ url_for('escenarios.list_esc',
+                                   page=p,
+                                   per_page=per_page,
+                                   comuna=comuna_seleccionada) }}"
+                >
+                  {{ p }}
+                </a>
+              </li>
+            {% endfor %}
+
+            <li class="page-item {% if page >= pages %}disabled{% endif %}">
+              <a
+                class="page-link"
+                href="{{ url_for('escenarios.list_esc',
+                                 page=page+1,
+                                 per_page=per_page,
+                                 comuna=comuna_seleccionada) }}"
+              >
+                Siguiente
+              </a>
+            </li>
+          </ul>
+        </nav>
+
       </div>
     </div>
   </div>
 </div>
+
 {% endblock %}

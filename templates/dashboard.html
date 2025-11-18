@@ -12,20 +12,31 @@
 </div>
 
 <div class="row mb-4">
+  <!-- Columna izquierda: total + pastel -->
   <div class="col-md-4">
-    <div class="card card-kpi shadow-sm">
+    <!-- Card: total de escenarios -->
+    <div class="card shadow-sm mb-3">
       <div class="card-body">
-        <h5 class="card-title">Total de escenarios</h5>
-        <p class="display-5 mb-0">{{ total }}</p>
+        <h4 class="card-title mb-2">Total de escenarios</h4>
+        <p class="display-4 mb-0">{{ total }}</p>
+      </div>
+    </div>
+
+    <!-- NUEVO Card: gráfico de pastel -->
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Porcentaje por comuna</h5>
+        <canvas id="pieComunas" height="220"></canvas>
       </div>
     </div>
   </div>
 
+  <!-- Columna derecha: gráfico de barras existente -->
   <div class="col-md-8">
-    <div class="card card-kpi shadow-sm">
+    <div class="card shadow-sm">
       <div class="card-body">
-        <h5 class="card-title">Escenarios por comuna</h5>
-        <canvas id="chartComunas" height="120"></canvas>
+        <h5 class="card-title mb-3">Escenarios por comuna</h5>
+        <canvas id="chartComunas" height="195"></canvas>
       </div>
     </div>
   </div>
@@ -80,6 +91,9 @@
 </div>
 {% endblock %} {% block scripts %} {{ super() }}
 <script>
+  const labelsComunas = {{ labels_comunas | tojson }};
+  const dataComunas = {{ data_comunas | tojson }};
+
   const comunas = [
     {% for row in by_comuna %}
       "{{ row.comuna }}"{% if not loop.last %},{% endif %}
@@ -109,6 +123,44 @@
           ticks: {
             precision: 0
           }
+        }
+      }
+    }
+  });
+
+  const ctxPie = document.getElementById('pieComunas').getContext('2d');
+
+  const totalEscenarios = dataComunas.reduce((acc, val) => acc + val, 0);
+
+  new Chart(ctxPie, {
+    type: 'pie',
+    data: {
+      labels: labelsComunas,
+      datasets: [{
+        data: dataComunas,
+        backgroundColor: [
+          '#4e79a7', '#f28e2b', '#e15759', '#76b7b2',
+          '#59a14f', '#edc948', '#b07aa1', '#ff9da7',
+          '#9c755f', '#bab0ac', '#8cd17d'
+        ]
+      }]
+    },
+    options: {
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const value = context.parsed;
+              const percent = totalEscenarios
+                ? (value * 100 / totalEscenarios).toFixed(1)
+                : 0;
+              const label = context.label || '';
+              return `${label}: ${value} (${percent}%)`;
+            }
+          }
+        },
+        legend: {
+          position: 'bottom'
         }
       }
     }
