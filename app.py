@@ -3,7 +3,9 @@ from dotenv import load_dotenv
 import os
 
 def create_app():
-    load_dotenv()
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    load_dotenv(os.path.join(BASE_DIR, '.env'))
+
     print("DEBUG DB_URL:", repr(os.getenv("DATABASE_URL")))
     app = Flask(__name__)
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'devkey')

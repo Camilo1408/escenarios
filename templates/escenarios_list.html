@@ -13,35 +13,25 @@
   <div class="col-md-12 d-flex justify-content-between align-items-center">
     <form class="row g-2 align-items-end" method="get">
       <div class="col-auto">
-        <label for="comuna" class="form-label mb-0">Filtrar por comuna:</label>
-        <select
-          id="comuna"
-          name="comuna"
-          class="form-select form-select-sm"
-          style="min-width: 140px"
-          onchange="this.form.submit()"
-        >
+        <label for="comuna_id" class="form-label mb-0">Filtrar por comuna:</label>
+        <select id="comuna_id" name="comuna_id" class="form-select form-select-sm" style="min-width: 160px"
+          onchange="this.form.submit()">
           <option value="">Todas</option>
           {% for c in comunas %}
-            <option value="{{ c }}" {% if c == comuna_seleccionada %}selected{% endif %}>
-              {{ c }}
-            </option>
+          <option value="{{ c.id }}" {% if comuna_seleccionada==c.id %}selected{% endif %}>
+            {{ c.nombre }}
+          </option>
           {% endfor %}
         </select>
       </div>
 
       <div class="col-auto">
         <label for="per_page" class="form-label mb-0">Resultados por página:</label>
-        <select
-          id="per_page"
-          name="per_page"
-          class="form-select form-select-sm"
-          onchange="this.form.submit()"
-        >
+        <select id="per_page" name="per_page" class="form-select form-select-sm" onchange="this.form.submit()">
           {% for n in [10, 25, 50] %}
-            <option value="{{ n }}" {% if per_page == n %}selected{% endif %}>
-              {{ n }}
-            </option>
+          <option value="{{ n }}" {% if per_page==n %}selected{% endif %}>
+            {{ n }}
+          </option>
           {% endfor %}
         </select>
       </div>
@@ -89,39 +79,28 @@
               <tr>
                 <td>{{ item.id }}</td>
                 <td>{{ item.comuna }}</td>
-                <td>{{ item.barrio }}</td>
+                <td>{{ item.barrio_nombre }}</td>
                 <td>{{ item.escenario }}</td>
                 <td>{{ item.direccion }}</td>
                 <td class="text-center">
                   {% set url = (item.url_maps or '').strip() %}
                   {% if url and url.startswith('http') %}
-                    <a
-                      href="{{ url }}"
-                      target="_blank"
-                      class="btn btn-outline-info btn-sm"
-                    >
-                      Ver mapa
-                    </a>
+                  <a href="{{ url }}" target="_blank" class="btn btn-outline-info btn-sm">
+                    Ver mapa
+                  </a>
                   {% else %}
-                    <button class="btn btn-outline-secondary btn-sm" disabled>
-                      Sin mapa
-                    </button>
+                  <button class="btn btn-outline-secondary btn-sm" disabled>
+                    Sin mapa
+                  </button>
                   {% endif %}
                 </td>
 
                 <td>
-                  <a
-                    href="{{ url_for('escenarios.edit_form', id=item.id) }}"
-                    class="btn btn-sm btn-primary mb-1"
-                  >
+                  <a href="{{ url_for('escenarios.edit_form', id=item.id) }}" class="btn btn-sm btn-primary mb-1">
                     Editar
                   </a>
-                  <form
-                    action="{{ url_for('escenarios.delete', id=item.id) }}"
-                    method="post"
-                    style="display: inline"
-                    onsubmit="return confirm('¿Eliminar este escenario?');"
-                  >
+                  <form action="{{ url_for('escenarios.delete', id=item.id) }}" method="post" style="display: inline"
+                    onsubmit="return confirm('¿Eliminar este escenario?');">
                     <button type="submit" class="btn btn-sm btn-danger">
                       Eliminar
                     </button>
@@ -143,39 +122,30 @@
         <nav aria-label="Paginación de escenarios">
           <ul class="pagination justify-content-center mt-3">
             <li class="page-item {% if page <= 1 %}disabled{% endif %}">
-              <a
-                class="page-link"
-                href="{{ url_for('escenarios.list_esc',
+              <a class="page-link" href="{{ url_for('escenarios.list_esc',
                                  page=page-1,
                                  per_page=per_page,
-                                 comuna=comuna_seleccionada) }}"
-              >
+                                 comuna_id=comuna_seleccionada) }}">
                 Anterior
               </a>
             </li>
 
             {% for p in range(1, pages + 1) %}
-              <li class="page-item {% if p == page %}active{% endif %}">
-                <a
-                  class="page-link"
-                  href="{{ url_for('escenarios.list_esc',
+            <li class="page-item {% if p == page %}active{% endif %}">
+              <a class="page-link" href="{{ url_for('escenarios.list_esc',
                                    page=p,
                                    per_page=per_page,
-                                   comuna=comuna_seleccionada) }}"
-                >
-                  {{ p }}
-                </a>
-              </li>
+                                   comuna_id=comuna_seleccionada) }}">
+                {{ p }}
+              </a>
+            </li>
             {% endfor %}
 
             <li class="page-item {% if page >= pages %}disabled{% endif %}">
-              <a
-                class="page-link"
-                href="{{ url_for('escenarios.list_esc',
+              <a class="page-link" href="{{ url_for('escenarios.list_esc',
                                  page=page+1,
                                  per_page=per_page,
-                                 comuna=comuna_seleccionada) }}"
-              >
+                                 comuna_id=comuna_seleccionada) }}">
                 Siguiente
               </a>
             </li>

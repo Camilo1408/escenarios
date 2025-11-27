@@ -1,12 +1,21 @@
-{% extends "base.html" %} {% if item %} {% set page_title = "Editar escenario #"
-~ item.id %} {% else %} {% set page_title = "Nuevo escenario" %} {% endif %} {%
-block title %}{{ page_title }}{% endblock %} {% block content %}
+{% extends "base.html" %}
+{% if item %}
+{% set page_title = "Editar escenario #" ~ item.id %}
+{% else %}
+{% set page_title = "Nuevo escenario" %}
+{% endif %}
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
 <div class="row mb-4">
   <div class="col-md-12">
     <h1 class="mb-1">{{ page_title }}</h1>
     <p class="text-muted">
-      {% if item %} Modifica la información del escenario y guarda los cambios.
-      {% else %} Ingresa los datos del nuevo escenario. {% endif %}
+      {% if item %}
+      Modifica la información del escenario y guarda los cambios.
+      {% else %}
+      Ingresa los datos del nuevo escenario.
+      {% endif %}
     </p>
   </div>
 </div>
@@ -16,82 +25,62 @@ block title %}{{ page_title }}{% endblock %} {% block content %}
     <div class="card shadow-sm mb-4">
       <div class="card-body">
         <form method="post">
+
           <div class="mb-3">
-            <label for="comuna" class="form-label">Comuna</label>
-            <input
-              type="number"
-              class="form-control"
-              id="comuna"
-              name="comuna"
-              required
-              min="1"
-              value="{{ item.comuna if item else '' }}"
-            />
+            <label for="nombre" class="form-label">Nombre del escenario</label>
+            <input type="text" class="form-control" id="nombre" name="nombre" required maxlength="160"
+              value="{{ item.escenario if item else '' }}" />
           </div>
 
           <div class="mb-3">
-            <label for="barrio" class="form-label">Barrio</label>
-            <input
-              type="text"
-              class="form-control"
-              id="barrio"
-              name="barrio"
-              required
-              maxlength="120"
-              value="{{ item.barrio if item else '' }}"
-            />
+            <label for="barrio_id" class="form-label">Barrio</label>
+            <select id="barrio_id" name="barrio_id" class="form-select" required>
+              <option value="">Seleccione un barrio</option>
+              {% for b in barrios %}
+              <option value="{{ b.id }}" {% if item and item.barrio and item.barrio.id==b.id %}selected{% endif %}>
+                {{ b.nombre }} (Comuna {{ b.comuna.nombre }})
+              </option>
+              {% endfor %}
+            </select>
+            <div class="form-text">
+              El barrio determina automáticamente la comuna asociada.
+            </div>
           </div>
 
           <div class="mb-3">
-            <label for="escenario" class="form-label"
-              >Nombre del escenario</label
-            >
-            <input
-              type="text"
-              class="form-control"
-              id="escenario"
-              name="escenario"
-              required
-              maxlength="160"
-              value="{{ item.escenario if item else '' }}"
-            />
+            <label for="tipo_escenario_id" class="form-label">Tipo de escenario</label>
+            <select id="tipo_escenario_id" name="tipo_escenario_id" class="form-select">
+              <option value="">Sin clasificar</option>
+              {% for t in tipos %}
+              <option value="{{ t.id }}" {% if item and item.tipo and item.tipo.id==t.id %}selected{% endif %}>
+                {{ t.nombre }}
+              </option>
+              {% endfor %}
+            </select>
           </div>
 
           <div class="mb-3">
             <label for="direccion" class="form-label">Dirección</label>
-            <input
-              type="text"
-              class="form-control"
-              id="direccion"
-              name="direccion"
-              maxlength="200"
-              value="{{ item.direccion if item else '' }}"
-            />
+            <input type="text" class="form-control" id="direccion" name="direccion" maxlength="200"
+              value="{{ item.direccion if item else '' }}" />
           </div>
 
           <div class="mb-3">
             <label for="url_maps" class="form-label">Enlace Google Maps</label>
-            <input
-              type="url"
-              class="form-control"
-              id="url_maps"
-              name="url_maps"
-              value="{{ item.url_maps if item else '' }}"
-            />
+            <input type="url" class="form-control" id="url_maps" name="url_maps"
+              value="{{ item.url_maps if item else '' }}" />
             <div class="form-text">
               Pega el enlace de Google Maps del escenario (opcional).
             </div>
           </div>
 
           <div class="d-flex justify-content-between">
-            <a
-              href="{{ url_for('escenarios.list_esc') }}"
-              class="btn btn-outline-secondary"
-            >
+            <a href="{{ url_for('escenarios.list_esc') }}" class="btn btn-outline-secondary">
               Volver al listado
             </a>
             <button type="submit" class="btn btn-primary">Guardar</button>
           </div>
+
         </form>
       </div>
     </div>
